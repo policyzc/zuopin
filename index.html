@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏UI设计作品集</title>
+<style>
+
+  :root {
+    --bg: #0d0f14; --bg-card: #161922; --border: #252a38;
+    --gold: #c9a96e; --gold-bright: #e6c98a;
+    --text: #e8e6e1; --text-dim: #8a8d98; --text-faint: #5a5d68;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text);
+    font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .hero { position:relative; min-height:92vh; display:flex; align-items:center; overflow:hidden; border-bottom:1px solid var(--border); }
+  .hero-bg { position:absolute; inset:0; background:url('359-鬼怪传/登录界面.png') center/cover no-repeat; opacity:.32; filter:saturate(.9); }
+  .hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(13,15,20,.55) 0%,rgba(13,15,20,.78) 60%,var(--bg) 100%); }
+  .hero-inner { position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:80px 40px; width:100%; }
+  .hero-tag { display:inline-block; font-size:13px; letter-spacing:4px; color:var(--gold); border:1px solid var(--gold); padding:6px 16px; margin-bottom:28px; }
+  .hero h1 { font-size:clamp(40px,7vw,76px); font-weight:800; line-height:1.1; letter-spacing:2px; margin-bottom:24px; }
+  .hero h1 span { color:var(--gold-bright); }
+  .hero p { font-size:17px; color:var(--text-dim); max-width:560px; margin-bottom:40px; }
+  .hero-stats { display:flex; gap:48px; flex-wrap:wrap; }
+  .hero-stat .num { font-size:36px; font-weight:700; color:var(--gold-bright); }
+  .hero-stat .label { font-size:13px; color:var(--text-dim); letter-spacing:1px; }
+  .hero-contact { margin-top:44px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .hero-contact::before { content:''; width:24px; height:1px; background:var(--gold); }
+  .hero-name { font-size:20px; font-weight:700; color:var(--gold-bright); letter-spacing:3px; }
+  .hero-tel { font-size:15px; color:var(--text-dim); letter-spacing:1px; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; text-decoration:none; display:inline-flex; align-items:center; gap:7px; }
+  .hero-tel:hover, .hero-tel.copied { color:var(--gold-bright); }
+  .tel-icon { flex:none; }
+  .container { max-width:1280px; margin:0 auto; padding:0 40px; }
+  .section { padding:90px 0 40px; }
+  .section-head { display:flex; align-items:baseline; gap:20px; margin-bottom:50px; padding-bottom:20px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .section-num { font-size:14px; color:var(--gold); letter-spacing:2px; }
+  .section-title { font-size:32px; font-weight:700; letter-spacing:2px; }
+  .section-desc { margin-left:auto; font-size:14px; color:var(--text-dim); }
+  .project { background:var(--bg-card); border:1px solid var(--border); border-radius:4px; margin-bottom:40px; overflow:hidden; }
+  .project-head { padding:26px 32px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .proj-icon { width:56px; height:56px; border-radius:10px; object-fit:cover; border:1px solid var(--border); flex:none; }
+  .project-name { font-size:22px; font-weight:700; letter-spacing:1px; }
+  .project-badge { font-size:12px; color:var(--gold); border:1px solid var(--gold); padding:3px 10px; border-radius:2px; }
+  .project-desc { font-size:14px; color:var(--text-dim); margin-left:auto; max-width:440px; text-align:right; }
+  .project-grid { padding:0 24px 24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .project-grid figure { margin:0; }
+  .project-grid img { width:100%; border-radius:3px; box-shadow:0 4px 16px rgba(0,0,0,.4); display:block; background:#10131a; }
+  .project-grid figcaption { font-size:12px; color:var(--text-faint); margin-top:8px; text-align:center; }
+  .page-project { background:var(--bg-card); border:1px solid var(--border); border-radius:4px; margin-bottom:40px; overflow:hidden; }
+  .page-body { padding:24px; display:flex; justify-content:center; }
+  .page-body img { max-width:100%; border-radius:3px; box-shadow:0 8px 32px rgba(0,0,0,.5); }
+  .skills { padding:80px 0 100px; border-top:1px solid var(--border); margin-top:60px; }
+  .skills-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); }
+  .skill-cell { background:var(--bg-card); padding:32px 28px; }
+  .skill-cell h4 { font-size:15px; color:var(--gold); margin-bottom:10px; letter-spacing:1px; }
+  .skill-cell p { font-size:13px; color:var(--text-dim); line-height:1.7; }
+  footer { text-align:center; padding:40px; font-size:13px; color:var(--text-faint); border-top:1px solid var(--border); }
+  @media (max-width:900px) {
+    .container { padding:0 20px; }
+    .hero-inner { padding:60px 20px; }
+    .project-desc { margin-left:0; text-align:left; width:100%; }
+    .project-grid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); }
+    .skills-grid { grid-template-columns:1fr 1fr; }
+    .section-desc { margin-left:0; width:100%; }
+  }
+
+  /* ===== 动效 ===== */
+  .js-anim .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+  .js-anim .reveal.in { opacity:1; transform:none; }
+  .hero-inner > * { animation:heroIn .8s cubic-bezier(.22,1,.36,1) both; }
+  .hero-inner > *:nth-child(1){ animation-delay:.05s; }
+  .hero-inner > *:nth-child(2){ animation-delay:.15s; }
+  .hero-inner > *:nth-child(3){ animation-delay:.25s; }
+  .hero-inner > *:nth-child(4){ animation-delay:.35s; }
+  .hero-inner > *:nth-child(5){ animation-delay:.45s; }
+  @keyframes heroIn { from{ opacity:0; transform:translateY(20px);} to{ opacity:1; transform:none;} }
+  .project-grid figure img { transition:transform .35s cubic-bezier(.22,1,.36,1), filter .35s ease; }
+  .project-grid figure:hover img { transform:scale(1.03); filter:brightness(1.06); }
+  @media (prefers-reduced-motion: reduce) {
+    .js-anim .reveal { opacity:1 !important; transform:none !important; transition:none !important; }
+    .hero-inner > * { animation:none !important; }
+    .project-grid figure img { transition:none !important; }
+  }
+
+  /* ===== 大图查看 ===== */
+  .lb { position:fixed; inset:0; z-index:100; background:rgba(8,10,14,.93); display:none; align-items:center; justify-content:center; padding:36px; }
+  .lb.open { display:flex; }
+  .lb-img { max-width:100%; max-height:100%; border-radius:4px; box-shadow:0 12px 48px rgba(0,0,0,.65); }
+  .lb-close { position:absolute; top:18px; right:22px; background:none; border:none; color:var(--text); font-size:30px; line-height:1; cursor:pointer; }
+  .lb-close:hover { color:var(--gold-bright); }
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">GAME UI PORTFOLIO</div>
+    <h1>游戏 UI 设计<br><span>作品集</span></h1>
+    <p>专注手游界面视觉设计，覆盖国风仙侠、欧美奇幻、休闲经营、科幻二次元等题材，从登录页、主界面到功能弹窗的完整 UI 系统设计。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">13+</div><div class="label">完整项目</div></div>
+      <div class="hero-stat"><div class="num">116+</div><div class="label">界面作品</div></div>
+      <div class="hero-stat"><div class="num">4</div><div class="label">主要风格方向</div></div>
+    </div>
+    <div class="hero-contact">
+      <span class="hero-name">郑策</span>
+      <button type="button" class="hero-tel" id="heroTel" data-tel="17785223950" title="点击复制号码"><span class="tel-num">17785223950</span><svg class="tel-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+    </div>
+  </div>
+</section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-num">01</div>
+        <div class="section-title">精选项目</div>
+        <div class="section-desc">优先展示的代表作品</div>
+      </div>
+    <div class="project">
+      <div class="project-head">
+        
+        <div class="project-name">烈焰世界</div>
+        <div class="project-badge">科幻二次元</div>
+        <div class="project-desc">蓝紫科技风二次元，个人信息、系统设置、商城与头像框界面。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="371-烈焰世界/个人信息.png" alt="个人信息"><figcaption>个人信息</figcaption></figure>
+        <figure><img src="371-烈焰世界/修改名字.png" alt="修改名字"><figcaption>修改名字</figcaption></figure>
+        <figure><img src="371-烈焰世界/商品购买.png" alt="商品购买"><figcaption>商品购买</figcaption></figure>
+        <figure><img src="371-烈焰世界/商城.png" alt="商城"><figcaption>商城</figcaption></figure>
+        <figure><img src="371-烈焰世界/基础设置.png" alt="基础设置"><figcaption>基础设置</figcaption></figure>
+        <figure><img src="371-烈焰世界/头像框.png" alt="头像框"><figcaption>头像框</figcaption></figure>
+        <figure><img src="371-烈焰世界/头像框 拷贝.png" alt="头像框 拷贝"><figcaption>头像框 拷贝</figcaption></figure>
+        <figure><img src="371-烈焰世界/按键自定义1.png" alt="按键自定义1"><figcaption>按键自定义1</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="387-花暖物语/ApkIcon.png" alt="花暖物语图标">
+        <div class="project-name">花暖物语</div>
+        <div class="project-badge">花园治愈系</div>
+        <div class="project-desc">明亮花园横版场景，商店、拼图、新手引导与升级系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="387-花暖物语/登录界面.png" alt="登录界面"><figcaption>登录界面</figcaption></figure>
+        <figure><img src="387-花暖物语/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="387-花暖物语/前往超市.png" alt="前往超市"><figcaption>前往超市</figcaption></figure>
+        <figure><img src="387-花暖物语/升级.png" alt="升级"><figcaption>升级</figcaption></figure>
+        <figure><img src="387-花暖物语/商店.png" alt="商店"><figcaption>商店</figcaption></figure>
+        <figure><img src="387-花暖物语/好友.png" alt="好友"><figcaption>好友</figcaption></figure>
+        <figure><img src="387-花暖物语/拼图.png" alt="拼图"><figcaption>拼图</figcaption></figure>
+        <figure><img src="387-花暖物语/设置.png" alt="设置"><figcaption>设置</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="260-梦魂觉醒/apkICON.png" alt="梦魂觉醒图标">
+        <div class="project-name">梦魂觉醒</div>
+        <div class="project-badge">Q版国风</div>
+        <div class="project-desc">Q版仙侠主界面，图鉴、技能、试炼、商店等功能入口布局。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="260-梦魂觉醒/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/宝藏效果图.png" alt="宝藏效果图"><figcaption>宝藏效果图</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/挑战成功效果图.png" alt="挑战成功效果图"><figcaption>挑战成功效果图</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/效果图.png" alt="效果图"><figcaption>效果图</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/效果图-2.png" alt="效果图·2"><figcaption>效果图·2</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/效果图1.png" alt="效果图1"><figcaption>效果图1</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/梦幻.png" alt="梦幻"><figcaption>梦幻</figcaption></figure>
+        <figure><img src="260-梦魂觉醒/试炼.png" alt="试炼"><figcaption>试炼</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="107-绝世狂怒/icon.png" alt="绝世狂怒图标">
+        <div class="project-name">绝世狂怒</div>
+        <div class="project-badge">城堡经营横版</div>
+        <div class="project-desc">森林城堡横版经营，矿场、商店、升级与讨伐玩法。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="107-绝世狂怒/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="107-绝世狂怒/升级.png" alt="升级"><figcaption>升级</figcaption></figure>
+        <figure><img src="107-绝世狂怒/商城.png" alt="商城"><figcaption>商城</figcaption></figure>
+        <figure><img src="107-绝世狂怒/商店.png" alt="商店"><figcaption>商店</figcaption></figure>
+        <figure><img src="107-绝世狂怒/奇迹神木.png" alt="奇迹神木"><figcaption>奇迹神木</figcaption></figure>
+        <figure><img src="107-绝世狂怒/模式选择.png" alt="模式选择"><figcaption>模式选择</figcaption></figure>
+        <figure><img src="107-绝世狂怒/矿场1.png" alt="矿场1"><figcaption>矿场1</figcaption></figure>
+        <figure><img src="107-绝世狂怒/讨伐.png" alt="讨伐"><figcaption>讨伐</figcaption></figure>
+      </div>
+    </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-num">02</div>
+        <div class="section-title">国风仙侠</div>
+        <div class="section-desc">蓝紫金 · Q版仙侠 · 古风经营</div>
+      </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="359-鬼怪传/appicon.png" alt="鬼怪传图标">
+        <div class="project-name">鬼怪传</div>
+        <div class="project-badge">国风Q版仙侠</div>
+        <div class="project-desc">蓝紫金配色，浮空仙城主界面，覆盖战斗、招募、图鉴、签到等完整系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="359-鬼怪传/登录界面.png" alt="登录界面"><figcaption>登录界面</figcaption></figure>
+        <figure><img src="359-鬼怪传/主界面-黑夜.png" alt="主界面·黑夜"><figcaption>主界面·黑夜</figcaption></figure>
+        <figure><img src="359-鬼怪传/商城1.png" alt="商城1"><figcaption>商城1</figcaption></figure>
+        <figure><img src="359-鬼怪传/在线奖励.png" alt="在线奖励"><figcaption>在线奖励</figcaption></figure>
+        <figure><img src="359-鬼怪传/恭喜获得.png" alt="恭喜获得"><figcaption>恭喜获得</figcaption></figure>
+        <figure><img src="359-鬼怪传/战斗胜利.png" alt="战斗胜利"><figcaption>战斗胜利</figcaption></figure>
+        <figure><img src="359-鬼怪传/挑战.png" alt="挑战"><figcaption>挑战</figcaption></figure>
+        <figure><img src="359-鬼怪传/签到.png" alt="签到"><figcaption>签到</figcaption></figure>
+        <figure><img src="359-鬼怪传/英雄信息.png" alt="英雄信息"><figcaption>英雄信息</figcaption></figure>
+        <figure><img src="359-鬼怪传/解锁新英雄.png" alt="解锁新英雄"><figcaption>解锁新英雄</figcaption></figure>
+        <figure><img src="359-鬼怪传/选择增益.png" alt="选择增益"><figcaption>选择增益</figcaption></figure>
+        <figure><img src="359-鬼怪传/首领来袭.png" alt="首领来袭"><figcaption>首领来袭</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="373-斩魂传奇/ApkIcon.png" alt="斩魂传奇图标">
+        <div class="project-name">斩魂传奇</div>
+        <div class="project-badge">紫白清新国风</div>
+        <div class="project-desc">浅紫白色调，修士角色养成与灵宝收集，界面轻盈通透。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="373-斩魂传奇/主界面-修士.png" alt="主界面·修士"><figcaption>主界面·修士</figcaption></figure>
+        <figure><img src="373-斩魂传奇/模拟经营主界面.png" alt="模拟经营主界面"><figcaption>模拟经营主界面</figcaption></figure>
+        <figure><img src="373-斩魂传奇/仙灵收集.png" alt="仙灵收集"><figcaption>仙灵收集</figcaption></figure>
+        <figure><img src="373-斩魂传奇/成就.png" alt="成就"><figcaption>成就</figcaption></figure>
+        <figure><img src="373-斩魂传奇/抽奖-抽奖.png" alt="抽奖·抽奖"><figcaption>抽奖·抽奖</figcaption></figure>
+        <figure><img src="373-斩魂传奇/法术详情.png" alt="法术详情"><figcaption>法术详情</figcaption></figure>
+        <figure><img src="373-斩魂传奇/灵宝抽取-金色.png" alt="灵宝抽取·金色"><figcaption>灵宝抽取·金色</figcaption></figure>
+        <figure><img src="373-斩魂传奇/藏宝阁.png" alt="藏宝阁"><figcaption>藏宝阁</figcaption></figure>
+        <figure><img src="373-斩魂传奇/觉醒.png" alt="觉醒"><figcaption>觉醒</figcaption></figure>
+        <figure><img src="373-斩魂传奇/角色详情.png" alt="角色详情"><figcaption>角色详情</figcaption></figure>
+        <figure><img src="373-斩魂传奇/解锁法术.png" alt="解锁法术"><figcaption>解锁法术</figcaption></figure>
+        <figure><img src="373-斩魂传奇/转世重修.png" alt="转世重修"><figcaption>转世重修</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="314-觉醒霸业/APkicon.png" alt="觉醒霸业图标">
+        <div class="project-name">觉醒霸业</div>
+        <div class="project-badge">紫金大气</div>
+        <div class="project-desc">金色 Logo 字配紫旗，厚重史诗感的登录界面与经营系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="314-觉醒霸业/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="314-觉醒霸业/加载界面.png" alt="加载界面"><figcaption>加载界面</figcaption></figure>
+        <figure><img src="314-觉醒霸业/商铺.png" alt="商铺"><figcaption>商铺</figcaption></figure>
+        <figure><img src="314-觉醒霸业/图鉴.png" alt="图鉴"><figcaption>图鉴</figcaption></figure>
+        <figure><img src="314-觉醒霸业/收取.png" alt="收取"><figcaption>收取</figcaption></figure>
+        <figure><img src="314-觉醒霸业/模式选择.png" alt="模式选择"><figcaption>模式选择</figcaption></figure>
+        <figure><img src="314-觉醒霸业/签到.png" alt="签到"><figcaption>签到</figcaption></figure>
+        <figure><img src="314-觉醒霸业/讨伐.png" alt="讨伐"><figcaption>讨伐</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="238-征将三国/登录图标.png" alt="征将三国图标">
+        <div class="project-name">征将三国</div>
+        <div class="project-badge">古风经营</div>
+        <div class="project-desc">蓝金古风，商铺经营、联盟宝库与战令奖励系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="238-征将三国/登录界面.png" alt="登录界面"><figcaption>登录界面</figcaption></figure>
+        <figure><img src="238-征将三国/登录领奖.png" alt="登录领奖"><figcaption>登录领奖</figcaption></figure>
+        <figure><img src="238-征将三国/伙计.png" alt="伙计"><figcaption>伙计</figcaption></figure>
+        <figure><img src="238-征将三国/商会.png" alt="商会"><figcaption>商会</figcaption></figure>
+        <figure><img src="238-征将三国/尚武令.png" alt="尚武令"><figcaption>尚武令</figcaption></figure>
+        <figure><img src="238-征将三国/帮派宝库.png" alt="帮派宝库"><figcaption>帮派宝库</figcaption></figure>
+        <figure><img src="238-征将三国/收入提升.png" alt="收入提升"><figcaption>收入提升</figcaption></figure>
+        <figure><img src="238-征将三国/果蔬铺.png" alt="果蔬铺"><figcaption>果蔬铺</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="261-神剑三国/icon_app.png" alt="神剑三国图标">
+        <div class="project-name">神剑三国</div>
+        <div class="project-badge">青绿山水</div>
+        <div class="project-desc">青绿山水地图风格，关卡选择、商行与幸运转盘系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="261-神剑三国/登录游戏.png" alt="登录游戏"><figcaption>登录游戏</figcaption></figure>
+        <figure><img src="261-神剑三国/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="261-神剑三国/历程-闯关成绩.png" alt="历程·闯关成绩"><figcaption>历程·闯关成绩</figcaption></figure>
+        <figure><img src="261-神剑三国/商行1.png" alt="商行1"><figcaption>商行1</figcaption></figure>
+        <figure><img src="261-神剑三国/杂货铺2.png" alt="杂货铺2"><figcaption>杂货铺2</figcaption></figure>
+        <figure><img src="261-神剑三国/游戏结算.png" alt="游戏结算"><figcaption>游戏结算</figcaption></figure>
+        <figure><img src="261-神剑三国/转盘.png" alt="转盘"><figcaption>转盘</figcaption></figure>
+        <figure><img src="261-神剑三国/选关.png" alt="选关"><figcaption>选关</figcaption></figure>
+      </div>
+    </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-num">03</div>
+        <div class="section-title">欧美奇幻</div>
+        <div class="section-desc">紫蓝金 · Q版龙与城堡 · 卡通经营</div>
+      </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="293-永恒魔兽/apk图标.png" alt="永恒魔兽图标">
+        <div class="project-name">永恒魔兽</div>
+        <div class="project-badge">Q版龙题材</div>
+        <div class="project-desc">紫蓝金配色，红龙角色主界面，闯关、无尽、图鉴完整系统。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="293-永恒魔兽/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="293-永恒魔兽/加载界面.png" alt="加载界面"><figcaption>加载界面</figcaption></figure>
+        <figure><img src="293-永恒魔兽/商店.png" alt="商店"><figcaption>商店</figcaption></figure>
+        <figure><img src="293-永恒魔兽/恭喜通关.png" alt="恭喜通关"><figcaption>恭喜通关</figcaption></figure>
+        <figure><img src="293-永恒魔兽/成就.png" alt="成就"><figcaption>成就</figcaption></figure>
+        <figure><img src="293-永恒魔兽/挑战模式.png" alt="挑战模式"><figcaption>挑战模式</figcaption></figure>
+        <figure><img src="293-永恒魔兽/无尽模式.png" alt="无尽模式"><figcaption>无尽模式</figcaption></figure>
+        <figure><img src="293-永恒魔兽/角色.png" alt="角色"><figcaption>角色</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="307-焚天魔兽/appicon.png" alt="焚天魔兽图标">
+        <div class="project-name">焚天魔兽</div>
+        <div class="project-badge">绿龙法师</div>
+        <div class="project-desc">大理石柱廊场景，绿龙法师角色，关卡与无尽双模式。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="307-焚天魔兽/登录界面.png" alt="登录界面"><figcaption>登录界面</figcaption></figure>
+        <figure><img src="307-焚天魔兽/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="307-焚天魔兽/关卡模式.png" alt="关卡模式"><figcaption>关卡模式</figcaption></figure>
+        <figure><img src="307-焚天魔兽/战斗结束.png" alt="战斗结束"><figcaption>战斗结束</figcaption></figure>
+        <figure><img src="307-焚天魔兽/灵气护盾.png" alt="灵气护盾"><figcaption>灵气护盾</figcaption></figure>
+        <figure><img src="307-焚天魔兽/秘银锭商店.png" alt="秘银锭商店"><figcaption>秘银锭商店</figcaption></figure>
+        <figure><img src="307-焚天魔兽/角色.png" alt="角色"><figcaption>角色</figcaption></figure>
+        <figure><img src="307-焚天魔兽/设置.png" alt="设置"><figcaption>设置</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="234-圣契传奇/应用图标_512.png" alt="圣契传奇图标">
+        <div class="project-name">圣契传奇</div>
+        <div class="project-badge">绿蓝卡通经营</div>
+        <div class="project-desc">卡通村庄经营场景，副本、公会、成就与战斗界面。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="234-圣契传奇/登录.jpg" alt="登录"><figcaption>登录</figcaption></figure>
+        <figure><img src="234-圣契传奇/主界面.png" alt="主界面"><figcaption>主界面</figcaption></figure>
+        <figure><img src="234-圣契传奇/8-战斗界面-快速攻击.jpg" alt="战斗界面·快速攻击"><figcaption>战斗界面·快速攻击</figcaption></figure>
+        <figure><img src="234-圣契传奇/9-战斗界面-首领出现.jpg" alt="战斗界面·首领出现"><figcaption>战斗界面·首领出现</figcaption></figure>
+        <figure><img src="234-圣契传奇/公会-创建公会.jpg" alt="公会·创建公会"><figcaption>公会·创建公会</figcaption></figure>
+        <figure><img src="234-圣契传奇/副本挑战-水晶洞窟.png" alt="副本挑战·水晶洞窟"><figcaption>副本挑战·水晶洞窟</figcaption></figure>
+        <figure><img src="234-圣契传奇/成就界面.jpg" alt="成就界面"><figcaption>成就界面</figcaption></figure>
+        <figure><img src="234-圣契传奇/申请列表.jpg" alt="申请列表"><figcaption>申请列表</figcaption></figure>
+      </div>
+    </div>
+    <div class="project">
+      <div class="project-head">
+        <img class="proj-icon" src="380-恒天大陆/appicon.png" alt="恒天大陆图标">
+        <div class="project-name">恒天大陆</div>
+        <div class="project-badge">紫顶城堡经营</div>
+        <div class="project-desc">紫色尖顶城堡，建筑升级、世界地图、英雄编组与转盘。</div>
+      </div>
+      <div class="project-grid">
+        <figure><img src="380-恒天大陆/七日登录.png" alt="七日登录"><figcaption>七日登录</figcaption></figure>
+        <figure><img src="380-恒天大陆/登录.png" alt="登录"><figcaption>登录</figcaption></figure>
+        <figure><img src="380-恒天大陆/主界面-扩展.png" alt="主界面·扩展"><figcaption>主界面·扩展</figcaption></figure>
+        <figure><img src="380-恒天大陆/世界.png" alt="世界"><figcaption>世界</figcaption></figure>
+        <figure><img src="380-恒天大陆/出击-开始.png" alt="出击·开始"><figcaption>出击·开始</figcaption></figure>
+        <figure><img src="380-恒天大陆/升级建筑.png" alt="升级建筑"><figcaption>升级建筑</figcaption></figure>
+        <figure><img src="380-恒天大陆/商城.png" alt="商城"><figcaption>商城</figcaption></figure>
+        <figure><img src="380-恒天大陆/幸运转盘.png" alt="幸运转盘"><figcaption>幸运转盘</figcaption></figure>
+        <figure><img src="380-恒天大陆/目标完成.png" alt="目标完成"><figcaption>目标完成</figcaption></figure>
+        <figure><img src="380-恒天大陆/胜利.png" alt="胜利"><figcaption>胜利</figcaption></figure>
+        <figure><img src="380-恒天大陆/英雄满级.png" alt="英雄满级"><figcaption>英雄满级</figcaption></figure>
+        <figure><img src="380-恒天大陆/解锁建筑.png" alt="解锁建筑"><figcaption>解锁建筑</figcaption></figure>
+      </div>
+    </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-num">04</div>
+        <div class="section-title">其他项目</div>
+        <div class="section-desc">整页作品合集</div>
+      </div>
+    <div class="page-project">
+      <div class="project-head">
+        <div class="project-name">天仙月</div>
+        <div class="project-badge">国风仙侠 MMO</div>
+        <div class="project-desc">青绿山水国风，完整 MMO 系统：登录、主界面、任务、角色、同伴、日历、商城、外观与活动。</div>
+      </div>
+      <div class="page-body">
+        <img src="项目-天仙月.jpg" alt="天仙月">
+      </div>
+    </div>
+    <div class="page-project">
+      <div class="project-head">
+        <div class="project-name">艾塔纪元</div>
+        <div class="project-badge">科幻机甲二次元</div>
+        <div class="project-desc">暗色科技风机甲少女题材，覆盖登录、角色、补给、签到、手册、背包等完整系统。</div>
+      </div>
+      <div class="page-body">
+        <img src="艾塔纪元.jpg" alt="艾塔纪元">
+      </div>
+    </div>
+    </div>
+  </section>
+
+<section class="skills">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">05</div>
+      <div class="section-title">设计能力</div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-cell"><h4>界面设计</h4><p>登录页、主界面、功能弹窗、战斗界面等完整 UI 系统设计，信息层级清晰，操作路径明确。</p></div>
+      <div class="skill-cell"><h4>风格适配</h4><p>国风仙侠、欧美奇幻、Q版卡通、休闲经营、科幻二次元等多题材风格把控，配色与造型随题材切换。</p></div>
+      <div class="skill-cell"><h4>组件规范</h4><p>按钮、图标、资源栏、弹窗等 UI 组件统一设计，保证同项目内视觉一致性。</p></div>
+      <div class="skill-cell"><h4>流程设计</h4><p>从新手引导、任务系统到付费转化的完整界面流程设计，兼顾美观与用户体验。</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>游戏 UI 设计作品集 · 共展示 13 个项目</footer>
+
+<div class="lb" id="lightbox" aria-hidden="true">
+  <button type="button" class="lb-close" id="lbClose" aria-label="关闭大图">×</button>
+  <img class="lb-img" id="lbImg" alt="">
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  document.body.classList.add('js-anim');
+  var targets = document.querySelectorAll('.project, .section-head, .page-project, .skill-cell');
+  targets.forEach(function(el){ el.classList.add('reveal'); });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold:.12, rootMargin:'0px 0px -8% 0px' });
+  targets.forEach(function(el){ io.observe(el); });
+})();
+(function(){
+  var btn = document.getElementById('heroTel');
+  if (!btn) return;
+  var tel = btn.getAttribute('data-tel');
+  var numEl = btn.querySelector('.tel-num');
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = tel; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+  function flash(){
+    var old = numEl.textContent;
+    btn.classList.add('copied');
+    numEl.textContent = '已复制';
+    setTimeout(function(){ numEl.textContent = old; btn.classList.remove('copied'); }, 1600);
+  }
+  btn.addEventListener('click', function(){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(tel).then(flash).catch(function(){ fallback(); flash(); });
+    } else { fallback(); flash(); }
+  });
+})();
+(function(){
+  var lb = document.getElementById('lightbox');
+  if (!lb) return;
+  var img = document.getElementById('lbImg');
+  var closeBtn = document.getElementById('lbClose');
+  function open(src, alt){ img.src = src; img.alt = alt || ''; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
+  function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); img.src = ''; }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('.project-grid img, .page-body img');
+    if (t){ open(t.src, t.alt); }
+  });
+  closeBtn.addEventListener('click', close);
+  lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+})();
+</script></body>
+</html>
